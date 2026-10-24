@@ -1,0 +1,13 @@
+import{useState,useEffect,useRef}from'react';
+import type{User}from'@supabase/supabase-js';
+import type{State}from'./domain';
+import{supabase,emptyState,loadCloud,saveCloud}from'./cloud';
+export function useCloudAccount(){
+ const[state,setState]=useState<State>(emptyState),[user,setUser]=useState<User|null>(null),[revision,setRevision]=useState(0),[status,setStatus]=useState('loading'),[error,setError]=useState('');
+ const lock=useRef(false),epoch=useRef(0),active=useRef<User|null>(null),rev=useRef(0);
+ async function refresh(){if(lock.current)return;const e=epoch.current;if(!active.current)return;lock.current=true;setStatus('loading');setError('');try{const r=await loadCloud();if(e!==epoch.current)return;setState(r.state);setRevision(r.revision);rev.current=r.revision;setStatus('ready')}catch(err){if(e===epoch.current){setError((err as Error).message);setStatus('error')}throw err}finally{lock.current=false}}
+ async function save(next:State){if(lock.current||!active.current||status!=='ready')throw Error('请等待加载或保存完成后再操作');const e=epoch.current;lock.current=true;setStatus('saving');setError('');try{const r=await saveCloud(next,rev.current);if(e!==epoch.current)throw Error('登录状态已变化，请重新加载');setState(next);setRevision(r);rev.current=r;setStatus('ready')}catch(err){if(e===epoch.current){setError((err as Error).message);setStatus('error')}throw err}finally{lock.current=false}}
+ useEffect(()=>{let alive=true;function changed(u:User|null){if(!alive)return;if(active.current?.id===u?.id&&u)return;epoch.current++;active.current=u;setUser(u);setState(emptyState());rev.current=0;setRevision(0);setError('');if(!u){setStatus('signed-out');return}setStatus('loading');const e=epoch.current;void loadCloud().then(r=>{if(!alive||e!==epoch.current)return;setState(r.state);rev.current=r.revision;setRevision(r.revision);setStatus('ready')}).catch(err=>{if(alive&&e===epoch.current){setError(err.message);setStatus('error')}})}const{data}=supabase.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>changed(session?.user??null),0)});supabase.auth.getSession().then(({data,error})=>{if(error){setStatus('error');setError(error.message)}else changed(data.session?.user??null)});return()=>{alive=false;data.subscription.unsubscribe()}},[]);
+ useEffect(()=>{const update=()=>{if(active.current&&!lock.current&&document.visibilityState==='visible')void refresh().catch(()=>{})};window.addEventListener('focus',update);document.addEventListener('visibilitychange',update);return()=>{window.removeEventListener('focus',update);document.removeEventListener('visibilitychange',update)}},[]);
+ return{state,setState,user,revision,status,error,busy:status==='loading'||status==='saving',save,refresh};
+}
