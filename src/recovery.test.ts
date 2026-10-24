@@ -1,0 +1,11 @@
+import assert from'node:assert/strict';
+import{recoveryToken}from'./recovery.ts';
+const h='a'.repeat(64),base='https://lulxfmocuhaspyjzwvdl.supabase.co/auth/v1/verify';
+assert.deepEqual(recoveryToken(base+'?token='+h+'&type=recovery&redirect_to=http://localhost:3000'),{token_hash:h,type:'recovery'});
+assert.equal(recoveryToken(base+'?token_hash='+h+'&amp;type=recovery').token_hash,h);
+assert.throws(()=>recoveryToken('https://example.com/auth/v1/verify?token='+h+'&type=recovery'));
+assert.throws(()=>recoveryToken(base+'?token='+h+'&type=signup'));
+assert.throws(()=>recoveryToken(base+'?token=abc&type=recovery'));
+assert.throws(()=>recoveryToken('javascript:alert(1)'));
+assert.throws(()=>recoveryToken('http://lulxfmocuhaspyjzwvdl.supabase.co/auth/v1/verify?token='+h+'&type=recovery'));
+console.log('PASS: recovery link parsing, localhost redirect ignored, foreign origins and wrong flow rejected.');
