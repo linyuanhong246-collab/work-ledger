@@ -1,0 +1,11 @@
+import{createClient}from'@supabase/supabase-js';import assert from'node:assert/strict';
+let input='';for await(const chunk of process.stdin)input+=chunk;const password=JSON.parse(input).password;
+const url='https://lulxfmocuhaspyjzwvdl.supabase.co',key='sb_publishable_b3EgGOsuqGZbci3e98iihA_sb36ZBl-';const client=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+const {error:loginError}=await client.auth.signInWithPassword({email:'ledger-integration-test@example.invalid',password});assert.equal(loginError,null,loginError?.message);
+const state={bosses:[{id:'b',name:'测试老板',rate:40000,note:''}],works:[{id:'w',bossId:'b',date:'2026-10-24',days:.5,content:'API验证'}],wages:[{id:'g',workId:'w',rate:40000,amount:20000}],expenses:[{id:'e',bossId:'b',date:'2026-10-24',amount:2000,purpose:'交通'}],receipts:[{id:'r',bossId:'b',date:'2026-10-24',amount:10000,note:''}],allocations:[{id:'a1',receiptId:'r',kind:'wage',targetId:'g',amount:8000},{id:'a2',receiptId:'r',kind:'expense',targetId:'e',amount:2000}]};
+const saved=await client.rpc('save_ledger',{p_state:state,p_expected:0});assert.equal(saved.error,null,saved.error?.message);assert.equal(saved.data,1);
+const loaded=await client.rpc('load_ledger');assert.equal(loaded.error,null);assert.deepEqual(loaded.data.state,state);
+const stale=await client.rpc('save_ledger',{p_state:state,p_expected:0});assert.ok(stale.error?.message.includes('其他设备'));
+const invalid=structuredClone(state);invalid.allocations[0].amount=30000;const over=await client.rpc('save_ledger',{p_state:invalid,p_expected:1});assert.ok(over.error?.message.includes('不能超过'));
+const anon=createClient(url,key,{auth:{persistSession:false}});const exposed=await anon.from('ledger_works').select();assert.ok(exposed.error||exposed.data.length===0);const denied=await anon.rpc('load_ledger');assert.ok(denied.error);
+await client.auth.signOut();console.log('PASS: Auth password login, atomic cloud save/load, stale version conflict, overpayment rejection, anonymous access denied, sign-out.');
