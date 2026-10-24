@@ -7,3 +7,31 @@
 .authHelp{display:flex;justify-content:space-between;gap:12px;margin-top:14px}.authHelp button{color:#2a7050;font-size:15px;text-decoration:underline;min-height:44px}.authHelp button:disabled{color:#94a18a}
 
 .recoveryLinkToggle{margin:9px auto;font-size:14px;min-height:40px;text-decoration:underline}.recoveryLinkPanel{background:#f1f6ed;border:1px solid #dce8d3;padding:16px;border-radius:12px;margin-top:16px}.recoveryLinkPanel>p{font-size:14px;line-height:1.8;margin:13px 0}.recoveryLinkPanel form>label{font-size:16px}.recoveryLinkPanel textarea{font-size:15px;overflow-wrap:anywhere}
+
+/* Shared mobile field geometry. Keep native pickers and user zoom available. */
+form,.formPair,.formPair>label,.extra,.sheetBody,.allocation,.allocationAmount,.importLabel,.loginCard,.recoveryLinkPanel{min-width:0}
+form>label,.formPair>label,.extra>label{display:block;font-size:17px;font-weight:600;line-height:1.5;color:#45613f}
+form>label>input,form>label>select,form>label>textarea,.formPair>label>input,.extra>label>input{display:block;margin-top:8px;font-weight:400}
+input:not([type="checkbox"]):not([type="radio"]):not([type="month"]),select,textarea{box-sizing:border-box;inline-size:100%;max-inline-size:100%;min-inline-size:0;font-size:18px;font-weight:400;line-height:1.5;border-radius:12px;padding:12px;min-height:52px}
+input[type="date"]{-webkit-appearance:none;appearance:none;text-align:left}
+input[type="date"]::-webkit-date-and-time-value{text-align:left;min-height:1.5em}
+input[type="date"]::-webkit-datetime-edit{padding:0;min-width:0}
+textarea{min-height:104px;resize:vertical;overflow-wrap:anywhere}
+.formPair{grid-template-columns:minmax(0,1fr);gap:17px}.formPair>label{margin:0}
+.extra>label{font-size:16px;margin-top:13px}.extra>label>input{margin-top:7px}
+.extra>.row{gap:10px}.extra>.row>button{min-width:40px;min-height:40px}
+.allocationAmount{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;font-size:16px;line-height:1.5;gap:8px}
+.allocationAmount input{width:100%;min-height:52px;font-weight:400}
+.sheetBody .sectionTitle{align-items:center;flex-wrap:wrap;row-gap:6px}
+.sheetBody .sectionTitle h3{margin:0}.sheetBody .sectionTitle .textBtn{min-height:40px}
+.sheet{min-width:0}.sheetBody{overflow-x:hidden;scroll-padding-bottom:24px}
+.sheetHeader{gap:12px}.sheetHeader h2{min-width:0}.sheetHeader .close{flex-shrink:0;min-width:40px;min-height:40px}
+.importLabel input[type="file"]{font-size:16px;line-height:1.5;padding:10px;min-height:52px;overflow:hidden}
+.importLabel input[type="file"]::file-selector-button{font:inherit;border:0;border-radius:7px;background:#e9f1e2;color:#3e6746;padding:7px 10px;margin-right:9px;max-width:100%}
+.recoveryLinkPanel textarea{font-size:16px;line-height:1.6;min-height:128px}
+.authHelp{flex-wrap:wrap;column-gap:18px;row-gap:4px}.recoveryLinkToggle{white-space:normal;text-align:center;line-height:1.6;max-width:100%;padding:8px 4px}
+.twoButtons{grid-template-columns:repeat(2,minmax(0,1fr))}.twoButtons>button{min-width:0;line-height:1.5;padding:12px 9px;white-space:normal}
+.monthPicker input{min-height:0;min-width:0;inline-size:100%;block-size:100%;margin:0}
+@media(max-width:360px){.sheetBody{padding:18px 16px 24px}.loginCard{padding:20px 16px}.recoveryLinkPanel{padding:14px}.twoButtons>button{font-size:14px}.allocationCheck>span{min-width:0}.allocationCheck b{line-height:1.5}}
+input:not([type="checkbox"]):not([type="radio"]):not([type="month"]):not([type="file"]),select{height:56px}
+.importLabel input[type="file"]{height:auto;min-height:62px}
